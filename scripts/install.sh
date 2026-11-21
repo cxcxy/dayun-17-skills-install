@@ -5,6 +5,8 @@ set -euo pipefail
 AGENTS="${DAYUN_SKILLS_AGENTS:-*}"
 SCOPE="${DAYUN_SKILLS_SCOPE:-global}"
 DRY_RUN="${DAYUN_SKILLS_DRY_RUN:-0}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+USAGE_FILE="${SCRIPT_DIR}/../USAGE.md"
 SURGEON_URL="https://raw.githubusercontent.com/LucianFord/agent-pack/main/agents/surgeon-reviewer.md"
 SURGEON_DEST="${HOME}/.claude/agents/surgeon-reviewer.md"
 
@@ -14,6 +16,25 @@ skip_list=()
 
 log() { printf '%s\n' "$*"; }
 hr() { log "----"; }
+
+# 成功或部分成功时把用法打到 stdout，方便人直接阅读，也方便 Agent 只转发脚本输出。
+print_usage() {
+  if [[ "$DRY_RUN" == "1" ]]; then
+    return 0
+  fi
+  if ((${#ok_list[@]} == 0)); then
+    return 0
+  fi
+  if [[ ! -f "$USAGE_FILE" ]]; then
+    log "✗ 未找到用法文档 ${USAGE_FILE}，无法在安装结果后附上用法。"
+    return 0
+  fi
+  log ""
+  log "========== DAYUN USAGE BEGIN =========="
+  cat "$USAGE_FILE"
+  printf '\n'
+  log "========== DAYUN USAGE END =========="
+}
 
 need_node() {
   if ! command -v node >/dev/null 2>&1; then
@@ -160,9 +181,14 @@ main() {
     log "失败 ${#fail_list[@]} 项："
     for x in "${fail_list[@]}"; do log "  ✗ $x"; done
     log "可重试：DAYUN_SKILLS_AGENTS='cursor' bash scripts/install.sh"
+    if ((${#ok_list[@]})); then
+      log "部分安装成功。失败项见上；下面仍附上完整用法。失败的技能请先重试，再按对应章节使用。"
+      print_usage
+    fi
     exit 1
   fi
   log "全部完成。建议新开一个 Agent 对话后再使用这些技能。"
+  print_usage
 }
 
 main "$@"

@@ -16,7 +16,7 @@ npx skills add cxcxy/dayun-17-skills-install -g -y
 
 > 帮我安装大昀那 17 项开发技能
 
-AI 会执行本仓库的 `scripts/install.sh`，批量安装清单里的技能。
+AI 会执行本仓库的 `scripts/install.sh`，批量安装清单里的技能。安装成功（或只成功一部分）时，脚本会把 [USAGE.md](./USAGE.md) 打在输出里，Agent 也会在同一条回复里给出每项的适用场景、解决的问题和用法，不用再自己去翻文件。
 
 ## 可选参数
 
@@ -30,6 +30,8 @@ DAYUN_SKILLS_SCOPE=project bash scripts/install.sh
 # 只看将执行的命令
 DAYUN_SKILLS_DRY_RUN=1 bash scripts/install.sh
 ```
+
+每项怎么用见 [USAGE.md](./USAGE.md)。下面只保留一句话，方便扫一眼。
 
 ## 清单（17 项各自做什么）
 
